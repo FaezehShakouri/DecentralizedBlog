@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { FaComment, FaTimes } from 'react-icons/fa';
 
 interface TableOfContentsItem {
   id: string;
@@ -144,7 +145,6 @@ Decentralized systems have the potential to revolutionize various industries and
       };
       setComments([...comments, newCommentObj]);
       setNewComment('');
-      setShowCommentSidebar(false);
       highlightComment(newCommentObj);
     }
   };
@@ -170,7 +170,7 @@ Decentralized systems have the potential to revolutionize various industries and
 
   return (
     <div className="flex max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div className="flex-grow">
+      <div className={`flex-grow transition-all duration-300 ${showCommentSidebar ? 'mr-96' : ''}`}>
         <div className="lg:flex lg:items-start lg:space-x-8">
           <div className="hidden lg:block lg:w-64 flex-shrink-0">
             <nav className="sticky top-8">
@@ -238,25 +238,53 @@ Decentralized systems have the potential to revolutionize various industries and
           </div>
         </div>
       </div>
-      {showCommentSidebar && (
-        <div className="w-80 ml-4 bg-gray-100 p-4 rounded-lg">
-          <h3 className="text-lg font-semibold mb-2">Add Comment</h3>
-          <p className="mb-2">Selected text: "{selectedText}"</p>
-          <textarea
-            className="w-full p-2 border rounded mb-2"
-            rows={4}
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Type your comment here..."
-          />
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded"
-            onClick={handleAddComment}
-          >
-            Add Comment
-          </button>
+      <div
+        className={`fixed top-0 right-0 h-full w-96 bg-gray-100 p-6 shadow-lg transform transition-transform duration-300 ${
+          showCommentSidebar ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <button
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+          onClick={() => setShowCommentSidebar(false)}
+        >
+          <FaTimes size={24} />
+        </button>
+        <h2 className="text-2xl font-bold mb-6 text-gray-800">Comments</h2>
+        {selectedText && (
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2 text-gray-700">Add New Comment</h3>
+            <p className="mb-2 text-sm text-gray-600">Selected text: "{selectedText}"</p>
+            <textarea
+              className="w-full p-3 border border-gray-300 rounded-md mb-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              rows={4}
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Type your comment here..."
+            />
+            <button
+              className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-300"
+              onClick={handleAddComment}
+            >
+              Add Comment
+            </button>
+          </div>
+        )}
+        <div className="space-y-4">
+          {comments.map((comment) => (
+            <div key={comment.id} className="bg-white p-4 rounded-md shadow">
+              <p className="text-gray-800">{comment.text}</p>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
+      <button
+        className={`fixed bottom-8 right-8 bg-blue-500 text-white p-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-300 ${
+          showCommentSidebar ? 'hidden' : ''
+        }`}
+        onClick={() => setShowCommentSidebar(true)}
+      >
+        <FaComment size={24} />
+      </button>
     </div>
   );
 };
